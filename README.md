@@ -1,5 +1,5 @@
 # Cross-feature Contrastive Loss
-This repository implements the momentum tracking algorithm proposed in "Momentum Tracking: Momentum Acceleration for Decentralized Deep Learning on Heterogeneous Data"
+This repository implements the momentum tracking algorithm proposed in "Momentum Tracking: Momentum Acceleration for Decentralized Deep Learning on Heterogeneous Data" [1]
 
 
 # Available Models
@@ -47,3 +47,14 @@ python trainer.py --lr=0.1  --batch-size=320  --world_size=10 --skew=1 --normtyp
 
 ```
 
+# Reference
+[1] Takezawa, Yuki, et al. "Momentum tracking: Momentum acceleration for decentralized deep learning on heterogeneous data." arXiv preprint arXiv:2209.15505 (2022).
+
+```
+@inproceedings{takezawa2023momentum,
+      title={Momentum Tracking: Momentum Acceleration for Decentralized Deep Learning on Heterogeneous Data}, 
+      author={Yuki Takezawa and Han Bao and Kenta Niwa and Ryoma Sato and Makoto Yamada},
+      year={2023},
+      booktitle={Transactions on Machine Learning Research}
+}
+```
