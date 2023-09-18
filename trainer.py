@@ -48,7 +48,7 @@ parser.add_argument('--skew', default=1.0, type=float,     help='skew=0 is most 
 parser.add_argument('--classes', default=10, type=int,     help='number of classes in the dataset')
 parser.add_argument('-b', '--batch-size', default=320, type=int,  help='mini-batch size (default: 128)')
 parser.add_argument('--lr', '--learning-rate', default=0.1, type=float,     metavar='LR', help='initial learning rate')
-#parser.add_argument('--gamma',  default=1.0, type=float,  metavar='AR', help='averaging rate')
+parser.add_argument('--gamma',  default=1.0, type=float,  metavar='AR', help='averaging rate')
 parser.add_argument('--momentum', default=0.9, type=float, metavar='M',     help='momentum')
 parser.add_argument('-world_size', '--world_size', default=10, type=int, help='total number of nodes')
 parser.add_argument('--epochs', default=200, type=int, metavar='N',   help='number of total epochs to run')
@@ -65,7 +65,7 @@ parser.add_argument('--save-every', dest='save_every',  help='Saves checkpoints 
 args = parser.parse_args()
 
 # Check the save_dir exists or not
-args.save_dir = os.path.join(args.save_dir, args.arch+"_nodes_"+str(args.world_size)+"_"+"_lr_"+ str(args.lr)+"_skew_"+str(args.skew)+"_"+args.graph+str(args.seed))
+args.save_dir = os.path.join(args.save_dir, args.arch+"_nodes_"+str(args.world_size)+"_lr_"+ str(args.lr)+"_skew_"+str(args.skew)+"_"+args.graph+"_"+str(args.seed))
 if not os.path.exists(os.path.join(args.save_dir, "excel_data") ):
     os.makedirs(os.path.join(args.save_dir, "excel_data") )
 torch.save(args, os.path.join(args.save_dir, "training_args.bin"))    
@@ -317,17 +317,27 @@ def run(rank, size):
     elif args.arch.lower() == 'vgg11':
         model = vgg11(num_classes=args.classes, dataset=args.dataset, norm_type=args.normtype, groups=2)
     elif args.arch.lower() == 'mobilenet':
-        model = MobileNetV2(num_classes=args.classes, dataset=args.dataset, norm_type=args.normtype, groups=2)
+        model = MobileNetV2(num_classes=args.classes, norm_type=args.normtype, groups=2)
     elif args.arch.lower() == 'cganet':
         model = cganet5(num_classes=args.classes, dataset=args.dataset, norm_type=args.normtype, groups=2)
+    elif args.arch.lower() == 'lenet5':
+        model = LeNet5()
     else:
         raise NotImplementedError
     
     if rank==0:
         print(args)
         print('Printing model summary...')
-        if 'cifar' in args.dataset: print(summary(model, (3, 32, 32), batch_size=int(args.batch_size/size), device='cpu'))
-        else: print(summary(model, (3, 224, 224), batch_size=int(args.batch_size/size), device='cpu'))
+        if args.dataset=="fmnist":
+            print(summary(model, (1,28,28), batch_size=int(args.batch_size/size), device='cpu'))
+        elif args.dataset=="imagenette_full":
+            print(summary(model, (3, 224, 224), batch_size=int(args.batch_size/size), device='cpu'))
+        elif args.dataset=="imagenet":
+            print(summary(model, (3, 224, 224), batch_size=int(args.batch_size/size), device='cpu'))
+        else: 
+            print(summary(model, (3, 32, 32), batch_size=int(args.batch_size/size), device='cpu'))
+        
+    
         
     if args.graph.lower()   == 'ring':
         graph = RingGraph(rank, size, args.devices, peers_per_itr=args.neighbors) #undirected ring structure => neighbors = 2 ; directed ring => neighbors=1
@@ -349,6 +359,7 @@ def run(rank, size):
 				comm_device=device,
                 momentum=args.momentum,
                 weight_decay=0.0,
+                gamma = args.gamma,
                 lr = args.lr) 
     model.to(device)
 

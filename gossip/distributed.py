@@ -34,7 +34,7 @@ class GossipDataParallel(Module):
     def __init__(self, module, device_ids=None, rank=None, world_size=None,
                  graph=None, mixing=None, comm_device=None,
                   synch_freq=0, verbose=False, use_streams=False,
-                 eta = 1, momentum=0.9, lr=0.1, weight_decay = 0):
+                 gamma = 1, momentum=0.9, lr=0.1, weight_decay = 0):
         super(GossipDataParallel, self).__init__()
 
         # devices available locally
@@ -68,7 +68,7 @@ class GossipDataParallel(Module):
         if mixing is None:
             mixing = UniformMixing(graph, comm_device)
         self.mixing_weights = mixing.get_mixing_weights()
-        self.averaging_rate   = torch.ones(1, device=comm_device).type(first_param_dtype)*eta
+        self.averaging_rate   = torch.ones(1, device=comm_device).type(first_param_dtype)*gamma
 
         # distributed backend config
         self.dist_config = {
