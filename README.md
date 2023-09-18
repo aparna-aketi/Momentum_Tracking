@@ -1,4 +1,4 @@
-# Cross-feature Contrastive Loss
+# Momentum Tracking
 This repository implements the momentum tracking algorithm proposed in "Momentum Tracking: Momentum Acceleration for Decentralized Deep Learning on Heterogeneous Data" [1]
 
 
@@ -21,12 +21,12 @@ This repository implements the momentum tracking algorithm proposed in "Momentum
 * Fully Connected Graph
 
 # Requirements
-* found in environment.yml file
+* found in env.yml file
 
 # Hyper-parameters
 * --world_size  = total number of agents
 * --graph       = graph topology (default ring); options: [ring, torus, full]
-* --neighbors   = number of neighbor per agent (default 2)
+* --neighbors   = number of neighbors per agent (default 2)
 * --arch        = model to train
 * --normtype    = type of normalization layer
 * --dataset     = dataset to train; ; options: [cifar10, cifar100, fmnist, imagenette, imagenet]
@@ -34,7 +34,6 @@ This repository implements the momentum tracking algorithm proposed in "Momentum
 * --epochs      = total number of training epochs
 * --lr          = learning rate
 * --momentum    = momentum coefficient
-* --gamma       = averaging rate for gossip 
 * --skew        = amount of skew in the data distribution; 1.0 = completely non-IID and 0 = random sampling (IID)
 
 
