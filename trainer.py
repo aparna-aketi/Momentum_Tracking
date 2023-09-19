@@ -81,23 +81,6 @@ class Partition(object):
     def __getitem__(self, index):
         data_idx = self.index[index]
         return self.data[data_idx]
-
-def skew_sort(indices, skew, classes, class_size, seed):
-    # skew belongs to [0,1]
-    rng = random.Random()
-    rng.seed(seed)
-    class_indices = {}
-    for i in range(0, classes):
-        class_indices[i]=indices[0:class_size[i]]
-        indices = indices[class_size[i]:]
-    random_indices = []
-    sorted_indices = []
-    for i in range(0, classes):
-        sorted_size    = int(skew*class_size[i])
-        sorted_indices = sorted_indices + class_indices[i][0:sorted_size]
-        random_indices = random_indices + class_indices[i][sorted_size:]
-    rng.shuffle(random_indices)
-    return random_indices, sorted_indices
             
     
 class DataPartitioner(object):
@@ -112,16 +95,15 @@ class DataPartitioner(object):
         for batch_idx, (inputs, targets) in enumerate(dataset):
               labels = labels+targets.tolist()
         #labels  = [data[i][1] for i in range(0, data_len)]
-        sort_index = np.argsort(np.array(labels))
-        indices = sort_index.tolist()
-        indices_rand, indices = skew_sort(indices, skew=skew, classes=classes, class_size=class_size, seed=seed)
+	indices_rand = rng.shuffle(labels)
+        sort_index   = np.argsort(np.array(labels))
+        indices      = sort_index.tolist()
         
         for i, frac in enumerate(sizes):
             if skew==1:
                 part_len = int(frac*data_len)
                 self.partitions.append(indices[0:part_len])
                 if len(sizes)>10 and i<10:
-                    #print('here', i, len(sizes), len(indices))
                     indices = indices[2*part_len:]+indices[part_len:2*part_len]
                 else:
                     indices = indices[part_len:]
@@ -129,13 +111,6 @@ class DataPartitioner(object):
                 part_len = int(frac*data_len)
                 self.partitions.append(indices_rand[0:part_len])
                 indices_rand = indices_rand[part_len:] 
-            else:
-                part_len = int(frac*data_len*skew); 
-                part_len_rand = int(frac*data_len*(1-skew))
-                part_ind = indices[0:part_len]+indices_rand[0:part_len_rand]
-                self.partitions.append(part_ind)
-                indices = indices[part_len:]
-                indices_rand = indices_rand[part_len_rand:]
 
     def use(self, partition):
         return Partition(self.data, self.partitions[partition])
