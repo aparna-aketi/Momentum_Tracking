@@ -95,6 +95,8 @@ class DataPartitioner(object):
         for batch_idx, (inputs, targets) in enumerate(dataset):
               labels = labels+targets.tolist()
         #labels  = [data[i][1] for i in range(0, data_len)]
+	rng = random.Random()
+        rng.seed(seed)
 	indices_rand = rng.shuffle(labels)
         sort_index   = np.argsort(np.array(labels))
         indices      = sort_index.tolist()
