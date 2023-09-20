@@ -97,9 +97,10 @@ class DataPartitioner(object):
         #labels  = [data[i][1] for i in range(0, data_len)]
 	rng = random.Random()
         rng.seed(seed)
-	indices_rand = rng.shuffle(labels)
+        indices_rand = copy.deepcopy(labels)
+        rng.shuffle(indices_rand)
         sort_index   = np.argsort(np.array(labels))
-        indices      = sort_index.tolist()
+        sort_indices = sort_index.tolist()
         
         for i, frac in enumerate(sizes):
             if skew==1:
