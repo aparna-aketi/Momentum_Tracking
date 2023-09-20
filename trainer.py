@@ -97,7 +97,7 @@ class DataPartitioner(object):
         #labels  = [data[i][1] for i in range(0, data_len)]
 	rng = random.Random()
         rng.seed(seed)
-        indices_rand = copy.deepcopy(labels)
+        indices_rand = np.arange(len(labels)).tolist()
         rng.shuffle(indices_rand)
         sort_index   = np.argsort(np.array(labels))
         sort_indices = sort_index.tolist()
